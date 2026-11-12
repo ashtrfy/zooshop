@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>ZooShop</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="header">
+        <a class="logo" href="{% url 'catalog' %}">ZooShop</a>
+        <form class="search" method="get" action="{% url 'catalog' %}">
+            <input type="text" name="q" placeholder="Поиск товаров...">
+            <button>Найти</button>
+        </form>
+        <div class="links">
+            {% if user.is_authenticated %}
+                {{ user.username }}
+                <a href="{% url 'orders' %}">Заказы</a>
+                <a href="{% url 'logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'login' %}">Войти</a>
+            {% endif %}
+            <a href="{% url 'cart' %}">Корзина</a>
+        </div>
+    </div>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

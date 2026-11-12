@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<a href="javascript:history.back()">Назад</a>
+
+<div class="product">
+    <div class="product-image">
+        {% if product.image %}
+            <img src="{{ product.image }}" alt="">
+        {% else %}
+            <div class="noimage">Нет изображения</div>
+        {% endif %}
+    </div>
+    <div>
+        <h1>{{ product.name }}</h1>
+        <h2>{{ product.price|floatformat:0 }} руб.</h2>
+        <ul>
+            {% if product.age %}<li>Возраст: {{ product.age }}</li>{% endif %}
+            {% if product.size %}<li>Размер: {{ product.size }}</li>{% endif %}
+            <li>Вес: {{ product.weight }} г</li>
+            <li>В наличии: {{ product.quantity }} шт.</li>
+        </ul>
+        <form method="post" action="{% url 'cart_add' product.id %}">
+            {% csrf_token %}
+            <button>В корзину</button>
+        </form>
+    </div>
+</div>
+
+<h2>Описание</h2>
+<p>{{ product.description }}</p>
+
+<h2>Характеристики</h2>
+<ul>
+    <li>Категория: {{ product.category }}</li>
+    <li>Производитель: {{ product.manufacturer }}</li>
+    {% for s in product.subtypes.all %}
+        <li>Подходит для: {{ s }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Отзывы ({{ reviews.count }}){% if rating %} — ★ {{ rating|floatformat:1 }}{% endif %}</h2>
+{% for r in reviews %}
+    <div class="review">
+        <b>{{ r.user.username }}</b> — оценка {{ r.rating }}, {{ r.date }}
+        <p>{{ r.text }}</p>
+    </div>
+{% empty %}
+    <p>Отзывов пока нет</p>
+{% endfor %}
+
+<h3>Оставить отзыв</h3>
+{% if user.is_authenticated %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button>Отправить</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить отзыв</p>
+{% endif %}
+{% endblock %}

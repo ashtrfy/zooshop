@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="types">
+    <a href="{% url 'catalog' %}">Все</a>
+    {% for t in types %}
+        <a href="?type={{ t.id }}" class="{% if t == current_type %}active{% endif %}">{{ t.name }}</a>
+    {% endfor %}
+</div>
+
+<div class="catalog">
+    <form class="filters" method="get">
+        <h3>Фильтры</h3>
+        {{ form.q }}
+        {{ form.type }}
+        <b>Категория</b>
+        {{ form.category }}
+        <b>Возраст</b>
+        {{ form.age }}
+        <b>Размер</b>
+        {{ form.size }}
+        <b>Производитель</b>
+        {{ form.manufacturer }}
+        <b>Цена</b>
+        <div class="price">{{ form.price_min }} {{ form.price_max }}</div>
+        <b>Рейтинг</b>
+        {{ form.rating }}
+        <button>Применить</button>
+        <a class="reset" href="{% url 'catalog' %}{% if current_type %}?type={{ current_type.id }}{% endif %}">Сбросить</a>
+    </form>
+
+    <div class="products">
+        <h2>{% if current_type %}{{ current_type.name }}{% else %}Популярные товары{% endif %}</h2>
+        <div class="grid">
+            {% for p in products %}
+                <div class="card">
+                    {% if p.image %}
+                        <img src="{{ p.image }}" alt="">
+                    {% else %}
+                        <div class="noimage">Нет изображения</div>
+                    {% endif %}
+                    <a href="{% url 'product' p.id %}">{{ p.name }}</a>
+                    <div>{% if p.rating %}★ {{ p.rating|floatformat:1 }}{% else %}Нет оценок{% endif %}</div>
+                    <b>{{ p.price|floatformat:0 }} руб.</b>
+                    <form method="post" action="{% url 'cart_add' p.id %}">
+                        {% csrf_token %}
+                        <button>В корзину</button>
+                    </form>
+                </div>
+            {% empty %}
+                <p>Товары не найдены</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
